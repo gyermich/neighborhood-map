@@ -9,19 +9,26 @@ class App extends Component {
   }
 
   initMap = () => {
-    const map = new window.google.maps.Map(document.getElementById('map'), {
+    const google_maps = window.google.maps
+    const map = new google_maps.Map(document.getElementById('map'), {
       center: {lat: 35.652832, lng: 139.839478},
       zoom: 10
     })
+    const infowindow = new google_maps.InfoWindow()
 
     this.state.sights.forEach(sight => {
-      new window.google.maps.Marker({
+      const marker = new google_maps.Marker({
           position: {
             lat: sight.venue.location.lat,
             lng: sight.venue.location.lng},
           map: map,
           title: sight.venue.name
         })
+      const content = `${sight.venue.name} (${sight.venue.categories[0].name})`
+      marker.addListener('click', function() {
+        infowindow.setContent(content)
+        infowindow.open(map, marker);
+      })
     })
   }
 
@@ -53,7 +60,7 @@ class App extends Component {
       .then(response => {
         this.setState({
           sights: response.data.response.groups[0].items
-        },     this.loadMap())
+        }, this.loadMap())
       })
       .catch(error => {
         console.log("ERROR: ", error)
