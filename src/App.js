@@ -3,7 +3,6 @@ import './App.css';
 import axios from 'axios'
 
 class App extends Component {
-
   state = {
     sights: []
   }
@@ -11,11 +10,13 @@ class App extends Component {
   initMap = () => {
     const google_maps = window.google.maps
     const map = new google_maps.Map(document.getElementById('map'), {
+      // center map in Tokyo by default
       center: {lat: 35.652832, lng: 139.839478},
       zoom: 10
     })
     const infowindow = new google_maps.InfoWindow()
 
+    // create marker for each sight
     this.state.sights.forEach(sight => {
       const marker = new google_maps.Marker({
           position: {
@@ -25,6 +26,7 @@ class App extends Component {
           title: sight.venue.name
         })
       const content = `${sight.venue.name} (${sight.venue.categories[0].name})`
+      // add infowindow to each marker
       marker.addListener('click', function() {
         infowindow.setContent(content)
         infowindow.open(map, marker);
@@ -60,7 +62,7 @@ class App extends Component {
       .then(response => {
         this.setState({
           sights: response.data.response.groups[0].items
-        }, this.loadMap())
+        }, this.loadMap()) // Load map after successfully getting sights
       })
       .catch(error => {
         console.log("ERROR: ", error)
