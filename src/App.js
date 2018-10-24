@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import './App.css';
-import axios from 'axios'
 import Map from './Map'
 import SideBar from './SideBar'
+import { fetchTokyoSights } from './utils/api'
 
 class App extends Component {
   state = {
@@ -12,18 +12,25 @@ class App extends Component {
     zoom: 10,
   }
 
-  getSights = () => {
-    // get list of popular sight seeing places from Forsquare
-    const endpoint = 'https://api.foursquare.com/v2/venues/explore?'
-    const params = {
-      client_id: 'RCS1LDEMPSIEXRL5OTVLJAG0NRXJX5I30K1AAFJBZMODB3LW',
-      client_secret: 'S51CYXWC2PUL0E2XILOPFL3DRZTP3WWW14SSNGVW5VTK4FDI',
-      query: 'sights',
-      near: 'Tokyo',
-      v: '20181023'
-    }
+  closeAllInfoWindows = () => {
+    const markers = this.state.markers.map(marker => {
+      marker.isOpen = false
+      return marker
+    })
+    this.setState({ markers })
+  }
 
-    axios.get(endpoint + new URLSearchParams(params))
+  handleMarkerClick = marker => {
+    this.closeAllInfoWindows()
+    marker.isOpen = true;
+
+    this.setState({
+      markers: [...this.state.markers, marker]
+    })
+  }
+
+  getSights = () => {
+    fetchTokyoSights()
       .then(response => {
         const sights = response.data.response.groups[0].items
         const center = response.data.response.geocode.center
@@ -33,6 +40,7 @@ class App extends Component {
             lng: sight.venue.location.lng,
             isOpen: false,
             isVisible: true,
+            id: sight.venue.id
           }
         })
         this.setState({
@@ -53,8 +61,9 @@ class App extends Component {
   render() {
     return (
       <div className='container'>
-       <SideBar sights={this.state.sights}/>
-       <Map {...this.state}/>
+      <SideBar {...this.state}/>
+       <Map {...this.state}
+        handleMarkerClick={this.handleMarkerClick}/>
      </div>
     );
   }
