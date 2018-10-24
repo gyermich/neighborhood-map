@@ -1,58 +1,23 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import './App.css';
 import axios from 'axios'
+import Map from './Map'
+import SideBar from './SideBar'
 
 class App extends Component {
   state = {
-    sights: []
-  }
-
-  initMap = () => {
-    const google_maps = window.google.maps
-    const map = new google_maps.Map(document.getElementById('map'), {
-      // center map in Tokyo by default
-      center: {lat: 35.652832, lng: 139.839478},
-      zoom: 10
-    })
-    const infowindow = new google_maps.InfoWindow()
-
-    // create marker for each sight
-    this.state.sights.forEach(sight => {
-      const marker = new google_maps.Marker({
-          position: {
-            lat: sight.venue.location.lat,
-            lng: sight.venue.location.lng},
-          map: map,
-          title: sight.venue.name
-        })
-      const content = `${sight.venue.name} (${sight.venue.categories[0].name})`
-      // add infowindow to each marker
-      marker.addListener('click', function() {
-        infowindow.setContent(content)
-        infowindow.open(map, marker);
-      })
-    })
-  }
-
-  loadScript = (url) => {
-    const index = window.document.getElementsByTagName("script")[0]
-    const script = window.document.createElement("script")
-    script.src = url
-    script.async = true
-    script.defer = true
-    index.parentNode.insertBefore(script, index)
-  }
-
-  loadMap = () => {
-    this.loadScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyBROPR4-7MpztgTOr2x44yrh_hoLMLplUE&callback=initMap')
-    window.initMap = this.initMap
+    sights: [],
+    markers: [],
+    center: [],
+    zoom: 10,
   }
 
   getSights = () => {
+    // get list of popular sight seeing places from Forsquare
     const endpoint = 'https://api.foursquare.com/v2/venues/explore?'
     const params = {
-      client_id: '',
-      client_secret: '',
+      client_id: 'RCS1LDEMPSIEXRL5OTVLJAG0NRXJX5I30K1AAFJBZMODB3LW',
+      client_secret: 'S51CYXWC2PUL0E2XILOPFL3DRZTP3WWW14SSNGVW5VTK4FDI',
       query: 'sights',
       near: 'Tokyo',
       v: '20181023'
@@ -60,9 +25,21 @@ class App extends Component {
 
     axios.get(endpoint + new URLSearchParams(params))
       .then(response => {
+        const sights = response.data.response.groups[0].items
+        const center = response.data.response.geocode.center
+        const markers = sights.map(sight => {
+          return {
+            lat: sight.venue.location.lat,
+            lng: sight.venue.location.lng,
+            isOpen: false,
+            isVisible: true,
+          }
+        })
         this.setState({
-          sights: response.data.response.groups[0].items
-        }, this.loadMap()) // Load map after successfully getting sights
+          sights,
+          center,
+          markers,
+        })
       })
       .catch(error => {
         console.log("ERROR: ", error)
@@ -75,7 +52,10 @@ class App extends Component {
 
   render() {
     return (
-      <div id="map"></div>
+      <div className='container'>
+       <SideBar sights={this.state.sights}/>
+       <Map {...this.state}/>
+     </div>
     );
   }
 }
