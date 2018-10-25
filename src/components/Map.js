@@ -36,16 +36,46 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) =>
 ));
 
 export default class Map extends Component {
+    state = {
+        hasError: false
+    };
+
+    /* from https://scotch.io/tutorials/error-handling-in-react-16-using-error-boundaries)*/
+    componentDidCatch() {
+        this.setState({
+            hasError: true
+        });
+    }
+
+    componentDidMount() {
+        window.gm_authFailure = () => {
+            this.setState({
+                hasError: true
+            });
+        };
+    }
+
     render() {
-        return (
-            <MyMapComponent
-                {...this.props}
-                googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBROPR4-7MpztgTOr2x44yrh_hoLMLplUE"
-                loadingElement={<div style={{ height: `100%` }} />}
-                containerElement={<div style={{ height: `100vh`, width: '100%' }} />}
-                mapElement={<div style={{ height: `100%` }} />}
-            />
-        )
+        if (this.state.hasError) {
+            return (
+                <div className='error'>
+                    <h1>
+                        Oops! Failed to load Google Map API.
+                        Try refreshing the page or check your browser console for more details.
+                    </h1>
+                </div>
+            )
+        } else {
+            return (
+                <MyMapComponent
+                    {...this.props}
+                    googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyBROPR4-7MpztgTOr2x44yrh_hoLMLplUE"
+                    loadingElement={<div style={{ height: `100%` }} />}
+                    containerElement={<div style={{ height: `100vh`, width: '100%' }} />}
+                    mapElement={<div style={{ height: `100%` }} role="presentation" aria-hidden="true" />}
+                />
+            )
+        }
     }
 }
 

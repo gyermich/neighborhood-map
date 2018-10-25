@@ -40,6 +40,7 @@ class SideBar extends Component {
         return (
           <div className='sidebar'>
           <input
+            role={"search"}
             type={"search"}
             id={"search"}
             placeholder={"filter"}

@@ -9,6 +9,7 @@ class App extends Component {
     markers: [],
     center: [],
     zoom: 12,
+    hasError: false
   }
 
   updateMarkers = (markers) => {
@@ -67,7 +68,8 @@ class App extends Component {
         })
       })
       .catch(error => {
-        console.log("ERROR: ", error)
+        this.setState({ hasError: true })
+          console.error('Error while trying to fetch places from Foursquare Places API: ', error)
       })
   }
 
@@ -76,16 +78,27 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <div className='container'>
-      <SideBar {...this.state}
-        handleListItem={this.handleListItem}
-        updateMarkers={this.updateMarkers}
-        />
-       <Map {...this.state}
-        handleMarkerClick={this.handleMarkerClick}/>
-     </div>
-    );
+    if (this.state.hasError) {
+      return (
+        <div className='error'>
+          <h1>
+            Oops! Foursquare API failed to fetch data.
+            Try refreshing the page or check your browser console for more details.
+          </h1>
+        </div>
+      )
+    } else {
+      return (
+        <div className='container'>
+        <SideBar {...this.state}
+          handleListItem={this.handleListItem}
+          updateMarkers={this.updateMarkers}
+          />
+         <Map {...this.state}
+          handleMarkerClick={this.handleMarkerClick}/>
+       </div>
+      );
+    }
   }
 }
 
