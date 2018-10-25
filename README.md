@@ -1,7 +1,7 @@
 # Tokyo Sights Map
 
 This map shows a list of most popular Tokyo sightseeing places.
-This map is built with ReactJS, Forsquare API and react-google-maps that utilizes Google Maps JavaScript API.
+This map is built with ReactJS, Foursquare API and react-google-maps that utilizes Google Maps JavaScript API.
 
 ## How to get started:
 
