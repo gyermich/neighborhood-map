@@ -44,6 +44,7 @@ class SideBar extends Component {
             id={"search"}
             placeholder={"filter"}
             onChange={this.handleChange}
+            tabIndex="1"
             />
           <ul className='sight-list'>
             {this.handleSights().map((sight) =>
@@ -56,7 +57,7 @@ class SideBar extends Component {
                   src={sight.venue.categories[0].icon.prefix + '32'+ sight.venue.categories[0].icon.suffix}
                   alt={sight.venue.categories[0] + 'Icon'}
                 />
-                <div>{sight.venue.name}</div>
+                <div className='sight-name'>{sight.venue.name}</div>
               </li>
             )}
           </ul>

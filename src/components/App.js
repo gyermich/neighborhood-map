@@ -8,7 +8,7 @@ class App extends Component {
     sights: [],
     markers: [],
     center: [],
-    zoom: 10,
+    zoom: 12,
   }
 
   updateMarkers = (markers) => {
@@ -24,16 +24,19 @@ class App extends Component {
     this.setState({ markers })
   }
 
-  handleMarkerClick = marker => {
-    // if any other infowindows are open, close them first
+  handleMarkerClick = clickedMarker => {
+    // if any other markers are open, close them first
     this.closeAllInfoWindows()
-    // now open marker that was clicked
-    marker.isOpen = true;
-    marker.icon = 'spotlight-waypoint-a'
 
     this.setState({
-      markers: [...this.state.markers, marker]
-    })
+       ...this.state,
+       markers: this.state.markers.map(marker => marker.id === clickedMarker.id ?
+           // transform the one with a matching id
+           { ...marker, isOpen: true, icon: 'spotlight-waypoint-a' } :
+           // otherwise return original marker
+           marker
+       )
+     })
   }
 
   handleListItem = sight => {
