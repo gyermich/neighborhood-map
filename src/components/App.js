@@ -1,8 +1,7 @@
-import React, { Component, Fragment } from 'react';
-import './App.css';
+import React, { Component } from 'react';
 import Map from './Map'
 import SideBar from './SideBar'
-import { fetchTokyoSights } from './utils/api'
+import { fetchTokyoSights } from '../utils/api'
 
 class App extends Component {
   state = {
@@ -12,21 +11,35 @@ class App extends Component {
     zoom: 10,
   }
 
+  updateMarkers = (markers) => {
+    this.setState({ markers })
+  }
+
   closeAllInfoWindows = () => {
     const markers = this.state.markers.map(marker => {
       marker.isOpen = false
+      marker.icon = 'spotlight-waypoint-b'
       return marker
     })
     this.setState({ markers })
   }
 
   handleMarkerClick = marker => {
+    // if any other infowindows are open, close them first
     this.closeAllInfoWindows()
+    // now open marker that was clicked
     marker.isOpen = true;
+    marker.icon = 'spotlight-waypoint-a'
 
     this.setState({
       markers: [...this.state.markers, marker]
     })
+  }
+
+  handleListItem = sight => {
+    // find and open marker with the same venue id
+    const marker = this.state.markers.find(marker => marker.id === sight.venue.id)
+    this.handleMarkerClick(marker)
   }
 
   getSights = () => {
@@ -40,7 +53,8 @@ class App extends Component {
             lng: sight.venue.location.lng,
             isOpen: false,
             isVisible: true,
-            id: sight.venue.id
+            id: sight.venue.id,
+            icon: 'spotlight-waypoint-b'
           }
         })
         this.setState({
@@ -61,7 +75,10 @@ class App extends Component {
   render() {
     return (
       <div className='container'>
-      <SideBar {...this.state}/>
+      <SideBar {...this.state}
+        handleListItem={this.handleListItem}
+        updateMarkers={this.updateMarkers}
+        />
        <Map {...this.state}
         handleMarkerClick={this.handleMarkerClick}/>
      </div>

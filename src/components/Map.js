@@ -18,11 +18,17 @@ const MyMapComponent = withScriptjs(withGoogleMap((props) =>
                     key={index}
                     position={{ lat: marker.lat, lng: marker.lng }}
                     onClick={() => props.handleMarkerClick(marker)}
+                    // custom marker icons from https://stackoverflow.com/a/18531494
+                    options={{icon: { url: `https://mt.google.com/vt/icon/psize=16&font=fonts/arialuni_t.ttf&color=ff330000&name=icons/spotlight/${marker.icon}.png&ax=44&ay=48&scale=1`}}}
+
                 >
                     {marker.isOpen
                         &&
                         <InfoWindow>
-                        <div> {sight.venue.name} ({sight.venue.categories[0].name})</div>
+                        <div>
+                            {sight.venue.name}
+                            ({sight.venue.categories[0].name})
+                        </div>
                         </InfoWindow>}
                 </Marker>
     })}
